@@ -29,4 +29,13 @@ app.use('/api/carritos', require('./routes/carritosRoutes'));
 app.use('/api/proveedores', require('./routes/proveedoresRoutes'));
 app.use('/data', express.static(path.join(__dirname, 'data')));
 
+
+// ======== Importar Rutas services========
+app.use('/api/carritos', require('./services/carritosService.js'));
+app.use('/api/categorias', require('./services/categoriasService.js'));
+app.use('/api/clientes', require('./services/clientesService.js'));
+app.use('/api/pedidos', require('./services/pedidosService.js'));
+app.use('/api/productos', require('./services/productosService.js'));
+app.use('/api/proveedores', require('./services/proveedoresService.js'));
+
 app.listen(3000, () => console.log('Servidor en http://localhost:3000'));
