@@ -1,18 +1,31 @@
 const express = require('express');
 const fs = require('fs');
-const app = express();
 const path = require('path');
+
+const app = express();
 app.use(express.json());
 
-// Middleware de logging
+// ======== Middleware de logging ========
 app.use((req, res, next) => {
-  const log = { method: req.method, url: req.url, date: new Date() };
+  const log = { method: req.method, url: req.url, date: new Date().toISOString() };
   console.log(log);
-  fs.appendFileSync('./data/logs.json', JSON.stringify(log) + '\n');
+
+  const logPath = path.join(__dirname, 'data', 'logs.json');
+
+  // Crear la carpeta si no existe
+  if (!fs.existsSync(path.dirname(logPath))) {
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  }
+
+  // Agregar el log al archivo
+  fs.appendFileSync(logPath, JSON.stringify(log) + '\n');
   next();
 });
 
-// ======== Importar Controllers ========
+// ======== Servir archivos estáticos ========
+app.use('/data', express.static(path.join(__dirname, 'data')));
+
+// ======== Importar Controladores ========
 const productosController = require('./controllers/productosController');
 const categoriasController = require('./controllers/categoriasController');
 const clientesController = require('./controllers/clientesController');
@@ -27,15 +40,14 @@ app.use('/api/clientes', require('./routes/clientesRoutes'));
 app.use('/api/pedidos', require('./routes/pedidosRoutes'));
 app.use('/api/carritos', require('./routes/carritosRoutes'));
 app.use('/api/proveedores', require('./routes/proveedoresRoutes'));
-app.use('/data', express.static(path.join(__dirname, 'data')));
 
+app.use('/api/services/carritos', require('./services/carritosService.js'));
+app.use('/api/services/categorias', require('./services/categoriasService.js'));
+app.use('/api/services/clientes', require('./services/clientesService.js'));
+app.use('/api/services/pedidos', require('./services/pedidosService.js'));
+app.use('/api/services/productos', require('./services/productosService.js'));
+app.use('/api/services/proveedores', require('./services/proveedoresService.js'));
 
-// ======== Importar Rutas services========
-app.use('/api/carritos', require('./services/carritosService.js'));
-app.use('/api/categorias', require('./services/categoriasService.js'));
-app.use('/api/clientes', require('./services/clientesService.js'));
-app.use('/api/pedidos', require('./services/pedidosService.js'));
-app.use('/api/productos', require('./services/productosService.js'));
-app.use('/api/proveedores', require('./services/proveedoresService.js'));
-
-app.listen(3000, () => console.log('Servidor en http://localhost:3000'));
+// ======== Iniciar Servidor ========
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
