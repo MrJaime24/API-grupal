@@ -11,7 +11,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Importar rutas
+// ======== Importar Controllers ========
+const productosController = require('./controllers/productosController');
+const categoriasController = require('./controllers/categoriasController');
+const clientesController = require('./controllers/clientesController');
+const pedidosController = require('./controllers/pedidosController');
+const carritosController = require('./controllers/carritosController');
+const proveedoresController = require('./controllers/proveedoresController');
+
+// ======== Importar Rutas ========
 app.use('/api/productos', require('./routes/productosRoutes'));
 app.use('/api/categorias', require('./routes/categoriasRoutes'));
 app.use('/api/clientes', require('./routes/clientesRoutes'));
